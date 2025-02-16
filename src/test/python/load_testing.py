@@ -1,5 +1,8 @@
+import os
+
 from locust import HttpUser, task, between
 import random
+import psycopg2
 import uuid
 
 users = []
@@ -12,22 +15,44 @@ class UserBehavior(HttpUser):
     def __init__(self, parent):
         super().__init__(parent)
         self.username = None
-        self.token = ""
 
     def on_start(self):
         self.username = str(uuid.uuid4())
         while self.username in users:
             self.username = str(uuid.uuid4())
-        self.token = self.client.post("/api/auth", json={
+        token = self.client.post("/api/auth", json={
             "username": self.username,
             "password": "password"
         }).json().get("token")
-        self.client.headers.update({"Authorization": f"Bearer {self.token}"})
+        self.client.headers.update({"Authorization": f"Bearer {token}"})
         users.append(self.username)
 
-    @task(10)
+    def on_stop(self):
+        try:
+            conn = psycopg2.connect(
+                dbname="merch_store",
+                user=os.environ.get('MERCH_STORE_DB_USERNAME'),
+                password=os.environ.get('MERCH_STORE_DB_PASSWORD'),
+                host="localhost",
+                port="5432"
+            )
+            cursor = conn.cursor()
+
+            cursor.execute("DELETE FROM user_inventory WHERE username = %s", (self.username,))
+            cursor.execute("DELETE FROM history WHERE from_user = %s or to_user = %s", (self.username, self.username))
+            cursor.execute("DELETE FROM user_balance WHERE username = %s", (self.username,))
+            cursor.execute("DELETE FROM users WHERE username = %s", (self.username,))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+        except Exception as e:
+            print(f"Ошибка при удалении данных пользователя {self.username}: {e}")
+
+    @task(8)
     def get_info(self):
-        self.client.get("/api/info", headers={"Authorization": f"Bearer {self.token}"})
+        self.client.get("/api/info")
 
     @task(1)
     def send_coin(self):

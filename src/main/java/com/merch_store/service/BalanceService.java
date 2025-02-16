@@ -48,6 +48,9 @@ public class BalanceService {
         if (amount <= 0)
             throw new BadRequestException("Можно перевести только положительную сумму");
 
+        if (fromUserName.equals(sendCoinRequest.toUser()))
+            throw new BadRequestException("Нельзя перевести деньги самому себе");
+
         UserBalance fromUser = userService.getUserBalanceForUpdate(fromUserName);
         if (sendCoinRequest.amount() > fromUser.coins())
             throw new BadRequestException("На вашем балансе недостаточно средств");
@@ -55,6 +58,7 @@ public class BalanceService {
         UserBalance toUser = userService.increaseBalance(sendCoinRequest.toUser(), amount);
         if (toUser == null)
             throw new BadRequestException("Пользователь " + sendCoinRequest.toUser() + " не найден");
+
 
         userService.decreaseBalance(fromUser.username(), amount);
         historyRepository.create(fromUser.username(), toUser.username(), amount);

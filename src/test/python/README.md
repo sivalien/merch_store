@@ -1,7 +1,9 @@
 ## Как запустить  
+Установить env переменную `LOAD_TESTING=true`  
 Установить locust  
 ```
-pip3 install locust
+pip install psycopg2
+pip install locust
 ```
 Проверка установки 
 ```
