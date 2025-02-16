@@ -27,11 +27,10 @@ public class ExceptionHandlerController {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity handleRuntimeException(RuntimeException ex) {
-        return createBody("Внутренняя ошибка сервера " + ex.getMessage() , HttpStatus.INTERNAL_SERVER_ERROR);
+        return createBody("Внутренняя ошибка сервера" , HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity createBody(String error, HttpStatus status) {
-        System.out.println(error);
         return new ResponseEntity(Map.of("errors", error), status);
     }
 }

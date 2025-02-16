@@ -1,5 +1,5 @@
 ## Как запустить
-Установить locust  
+Установить locust и psycopg2
 ```
 pip install psycopg2
 pip install locust

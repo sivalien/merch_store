@@ -43,39 +43,49 @@ public class UserInventoryRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testFindByUserName() {
         String username = "existingUser";
         List<UserInventory> expected = List.of(new UserInventory(username, "hoody", 10));
 
+        String query = "select * from user_inventory where username=?";
         when(jdbcTemplate.query(
-                eq("select * from user_inventory where username=?"),
+                eq(query),
                 any(RowMapper.class),
-                any(String.class)
-        )).thenAnswer(invocation -> {
-            if (username.equals(invocation.getArgument(2))) {
-                return expected;
-            }
-            return List.of();
-        });
+                eq(username)
+        )).thenReturn(expected);
 
         List<UserInventory> result = userInventoryRepository.findByUserName(username);
         assertEquals(1, result.size());
         assertEquals(expected, result);
 
-        result = userInventoryRepository.findByUserName("Fake user");
+        verify(jdbcTemplate).query(
+                eq(query),
+                any(RowMapper.class),
+                eq(username)
+        );
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testFindByUserName_UserNotFound() {
+        String username = "user";
+
+        String query = "select * from user_inventory where username=?";
+        when(jdbcTemplate.query(
+                eq(query),
+                any(RowMapper.class),
+                any(String.class)
+        )).thenReturn(List.of());
+
+        List<UserInventory> result = userInventoryRepository.findByUserName(username);
         assertEquals(0, result.size());
         assertEquals(List.of(), result);
 
         verify(jdbcTemplate).query(
-                eq("select * from user_inventory where username=?"),
+                eq(query),
                 any(RowMapper.class),
                 eq(username)
-        );
-
-        verify(jdbcTemplate).query(
-                eq("select * from user_inventory where username=?"),
-                any(RowMapper.class),
-                eq("Fake user")
         );
     }
 }

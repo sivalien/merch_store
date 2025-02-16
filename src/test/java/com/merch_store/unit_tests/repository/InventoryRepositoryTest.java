@@ -9,17 +9,13 @@ public class InventoryRepositoryTest {
     private final InventoryRepository inventoryRepository = new InventoryRepository();
 
     @Test
-    void testHasMerge() {
-        assertTrue(inventoryRepository.hasMerge("t-shirt"));
-        assertTrue(inventoryRepository.hasMerge("hoody"));
-        assertFalse(inventoryRepository.hasMerge("non-existent-item"));
-        assertFalse(inventoryRepository.hasMerge(""));
+    void testFindPrice() {
+        assertEquals(80, inventoryRepository.findPrice("t-shirt"));
+        assertEquals(500, inventoryRepository.findPrice("pink-hoody"));
     }
 
     @Test
-    void testFindPrice_WhenInventoryExists() {
-        assertEquals(80, inventoryRepository.findPrice("t-shirt"));
-        assertEquals(500, inventoryRepository.findPrice("pink-hoody"));
+    void testFindPrice_InventoryNotFound() {
         assertNull(inventoryRepository.findPrice("non-existent-item"));
         assertNull(inventoryRepository.findPrice(""));
     }

@@ -10,7 +10,7 @@ items = ['cup', 'pen', 'socks']
 
 
 class UserBehavior(HttpUser):
-    wait_time = between(1, 5)
+    wait_time = between(0.4, 0.6)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -30,7 +30,7 @@ class UserBehavior(HttpUser):
     def on_stop(self):
         try:
             conn = psycopg2.connect(
-                dbname="merch_store",
+                dbname=os.environ.get('MERCH_STORE_DB_NAME'),
                 user=os.environ.get('MERCH_STORE_DB_USERNAME'),
                 password=os.environ.get('MERCH_STORE_DB_PASSWORD'),
                 host="localhost",

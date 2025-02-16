@@ -43,6 +43,7 @@ public class HistoryRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void findByFromUser() {
         String username = "user";
         List<History> expected = List.of(
@@ -69,6 +70,7 @@ public class HistoryRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void findByToUser() {
         String username = "user";
         List<History> expected = List.of(

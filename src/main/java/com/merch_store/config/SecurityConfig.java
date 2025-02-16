@@ -43,7 +43,7 @@ public class SecurityConfig {
                     return corsConfiguration;
                 }))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(HttpMethod.POST, "/api/auth", "/api/user", "/api/v1/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))

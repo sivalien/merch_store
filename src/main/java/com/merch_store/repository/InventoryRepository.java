@@ -19,10 +19,6 @@ public class InventoryRepository {
             "pink-hoody", 500
     );
 
-    public boolean hasMerge(String merch) {
-        return inventoryToPrice.containsKey(merch);
-    }
-
     public Integer findPrice(String inventory) {
         return inventoryToPrice.getOrDefault(inventory, null);
     }

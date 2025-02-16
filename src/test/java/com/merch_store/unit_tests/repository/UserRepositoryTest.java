@@ -27,6 +27,7 @@ public class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCreate() {
         String username = "User";
         String password = "password";
@@ -52,6 +53,7 @@ public class UserRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testFindByName_UserExits() {
         String username = "Existing User";
         User user = new User(username, "password");
@@ -73,6 +75,7 @@ public class UserRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testFindByName_UserNotFound() {
         String username = "Fake User";
 
