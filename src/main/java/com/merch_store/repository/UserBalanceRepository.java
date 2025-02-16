@@ -1,7 +1,6 @@
 package com.merch_store.repository;
 
 import com.merch_store.repository.dto.UserBalance;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.DataClassRowMapper;
@@ -32,7 +31,7 @@ public class UserBalanceRepository {
         );
     }
 
-    public UserBalance findByName(String username) {
+    public UserBalance findForUpdate(String username) {
         List<UserBalance> res = jdbcTemplate.query(
                 "select * from user_balance where username=? for no key update",
                 new DataClassRowMapper<>(UserBalance.class),
@@ -41,7 +40,26 @@ public class UserBalanceRepository {
         return res.size() == 0 ? null : res.get(0);
     }
 
-    public void setCoinsByName(Long coins, String username) {
-        jdbcTemplate.update("update user_balance set coins=? where username=?", coins, username);
+    public UserBalance findForRead(String username) {
+        List<UserBalance> res = jdbcTemplate.query(
+                "select * from user_balance where username=? for share",
+                new DataClassRowMapper<>(UserBalance.class),
+                username
+        );
+        return res.size() == 0 ? null : res.get(0);
+    }
+
+    public UserBalance increaseCoinsByName(Long coins, String username) {
+        List<UserBalance> res = jdbcTemplate.query(
+                "update user_balance set coins=coins + ? where username=? returning username, coins",
+                new DataClassRowMapper<>(UserBalance.class),
+                coins,
+                username
+        );
+        return res.size() == 0 ? null : res.get(0);
+    }
+
+    public void decreaseCoinsByName(Long coins, String username) {
+        jdbcTemplate.update("update user_balance set coins=coins - ? where username=?", coins, username);
     }
 }

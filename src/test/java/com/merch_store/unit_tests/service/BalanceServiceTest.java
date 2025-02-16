@@ -48,14 +48,14 @@ public class BalanceServiceTest {
         UserBalance user = new UserBalance(username,  200L);
 
         when(inventoryRepository.findPrice(inventory.toLowerCase())).thenReturn(price);
-        when(userService.getUserBalance(username)).thenReturn(user);
+        when(userService.getUserBalanceForUpdate(username)).thenReturn(user);
 
         balanceService.purchase(username, inventory);
 
-        verify(userService).getUserBalance(username);
+        verify(userService).getUserBalanceForUpdate(username);
         verify(inventoryRepository).findPrice(inventory);
         verify(userInventoryRepository).createOrUpdate(username, inventory, 1);
-        verify(userService).changeBalance(username, user.coins() - price);
+        verify(userService).decreaseBalance(username, (long) price);
     }
 
     @Test
@@ -78,11 +78,11 @@ public class BalanceServiceTest {
         UserBalance user = new UserBalance(username, 50L);
 
         when(inventoryRepository.findPrice(inventory.toLowerCase())).thenReturn(price);
-        when(userService.getUserBalance(username)).thenReturn(user);
+        when(userService.getUserBalanceForUpdate(username)).thenReturn(user);
 
         assertThrows(BadRequestException.class, () -> balanceService.purchase(username, inventory));
 
-        verify(userService).getUserBalance(username);
+        verify(userService).getUserBalanceForUpdate(username);
     }
 
     @Test
@@ -94,15 +94,14 @@ public class BalanceServiceTest {
         UserBalance toUser = new UserBalance(toUsername, 50L);
         SendCoinRequest request = new SendCoinRequest(toUsername, amount);
 
-        when(userService.getUserBalance(fromUsername)).thenReturn(fromUser);
-        when(userService.getUserBalance(toUsername)).thenReturn(toUser);
+        when(userService.getUserBalanceForUpdate(fromUsername)).thenReturn(fromUser);
+        when(userService.increaseBalance(toUsername, amount)).thenReturn(toUser);
 
         balanceService.transfer(fromUsername, request);
 
-        verify(userService).getUserBalance(fromUsername);
-        verify(userService).getUserBalance(toUsername);
-        verify(userService).changeBalance(fromUsername, fromUser.coins() - amount);
-        verify(userService).changeBalance(toUsername, toUser.coins() + amount);
+        verify(userService).getUserBalanceForUpdate(fromUsername);
+        verify(userService).decreaseBalance(fromUsername, amount);
+        verify(userService).increaseBalance(toUsername, amount);
         verify(historyRepository).create(fromUsername, toUsername, amount);
     }
 
@@ -114,11 +113,11 @@ public class BalanceServiceTest {
         UserBalance fromUser = new UserBalance(fromUsername, 100L);
         SendCoinRequest request = new SendCoinRequest(toUsername, amount);
 
-        when(userService.getUserBalance(fromUsername)).thenReturn(fromUser);
+        when(userService.getUserBalanceForUpdate(fromUsername)).thenReturn(fromUser);
 
         assertThrows(BadRequestException.class, () -> balanceService.transfer(fromUsername, request));
 
-        verify(userService).getUserBalance(fromUsername);
+        verify(userService).getUserBalanceForUpdate(fromUsername);
     }
 
     @Test
@@ -129,12 +128,13 @@ public class BalanceServiceTest {
         UserBalance fromUser = new UserBalance(fromUsername, 100L);
         SendCoinRequest request = new SendCoinRequest(toUsername, amount);
 
-        when(userService.getUserBalance(fromUsername)).thenReturn(fromUser);
-        when(userService.getUserBalance(toUsername)).thenReturn(null);
+        when(userService.getUserBalanceForUpdate(fromUsername)).thenReturn(fromUser);
+        when(userService.increaseBalance(toUsername, amount)).thenReturn(null);
 
         assertThrows(BadRequestException.class, () -> balanceService.transfer(fromUsername, request));
 
-        verify(userService).getUserBalance(toUsername);
+        verify(userService).getUserBalanceForUpdate(fromUsername);
+        verify(userService).increaseBalance(toUsername, amount);
     }
 
     @Test
@@ -157,7 +157,7 @@ public class BalanceServiceTest {
                 new History(2L, username4, username, 100L)
         );
 
-        when(userService.getUserBalance(username)).thenReturn(user);
+        when(userService.getUserBalanceForRead(username)).thenReturn(user);
         when(userInventoryRepository.findByUserName(username)).thenReturn(purchases);
         when(historyRepository.findByFromUser(username)).thenReturn(fromUserTransfers);
         when(historyRepository.findByToUser(username)).thenReturn(toUserTransfers);
@@ -177,7 +177,7 @@ public class BalanceServiceTest {
 
         assertEquals(expected, response);
 
-        verify(userService).getUserBalance(username);
+        verify(userService).getUserBalanceForRead(username);
         verify(userInventoryRepository).findByUserName(username);
         verify(historyRepository).findByFromUser(username);
         verify(historyRepository).findByToUser(username);

@@ -1,7 +1,7 @@
 package com.merch_store.repository;
 
 import com.merch_store.repository.dto.UserInventory;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-@AllArgsConstructor
 public class UserInventoryRepository {
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     public void createOrUpdate(String username, String inventory, Integer quantity) {

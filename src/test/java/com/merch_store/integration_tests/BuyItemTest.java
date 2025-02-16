@@ -68,7 +68,7 @@ public class BuyItemTest extends AbstractIntegrationTest {
         userRepository.create(username, passwordEncoder.encode(password));
         userBalanceRepository.create(username);
         Integer prevQuantity = getQuantityByUserAndItem(username, item);
-        Long prevCoins = userBalanceRepository.findByName(username).coins();
+        Long prevCoins = userBalanceRepository.findForUpdate(username).coins();
 
         HttpHeaders authHeaders = new HttpHeaders();
         authHeaders.set("Content-Type", "application/json");
@@ -90,7 +90,7 @@ public class BuyItemTest extends AbstractIntegrationTest {
                 String.class
         );
         Integer quantity = getQuantityByUserAndItem(username, item);
-        Long coins = userBalanceRepository.findByName(username).coins();
+        Long coins = userBalanceRepository.findForUpdate(username).coins();
 
         assertTrue(response.getStatusCode().is2xxSuccessful());
         assertEquals(1, quantity - prevQuantity);

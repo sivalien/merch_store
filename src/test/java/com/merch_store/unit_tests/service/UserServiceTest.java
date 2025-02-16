@@ -76,36 +76,26 @@ public class UserServiceTest {
         String username = "user";
         UserBalance userBalance = new UserBalance(username, 100L);
 
-        when(userBalanceRepository.findByName(username)).thenReturn(userBalance);
+        when(userBalanceRepository.findForUpdate(username)).thenReturn(userBalance);
 
-        UserBalance result = userService.getUserBalance(username);
+        UserBalance result = userService.getUserBalanceForUpdate(username);
 
         assertNotNull(result);
         assertEquals(userBalance, result);
 
-        verify(userBalanceRepository).findByName(username);
+        verify(userBalanceRepository).findForUpdate(username);
     }
 
     @Test
     void testGetUserBalance_UserNotExists() {
         String username = "unknownUser";
 
-        when(userBalanceRepository.findByName(username)).thenReturn(null);
+        when(userBalanceRepository.findForUpdate(username)).thenReturn(null);
 
-        UserBalance result = userService.getUserBalance(username);
+        UserBalance result = userService.getUserBalanceForUpdate(username);
         assertNull(result);
 
-        verify(userBalanceRepository).findByName(username);
-    }
-
-    @Test
-    void testChangeBalance() {
-        String username = "user";
-        Long balance = 200L;
-
-        userService.changeBalance(username, balance);
-
-        verify(userBalanceRepository).setCoinsByName(balance, username);
+        verify(userBalanceRepository).findForUpdate(username);
     }
 
     @Test

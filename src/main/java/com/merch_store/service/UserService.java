@@ -23,12 +23,20 @@ public class UserService {
         return userRepository.findByName(username);
     }
 
-    public UserBalance getUserBalance(String username) {
-        return userBalanceRepository.findByName(username);
+    public UserBalance getUserBalanceForUpdate(String username) {
+        return userBalanceRepository.findForUpdate(username);
     }
 
-    public void changeBalance(String username, Long balance) {
-        userBalanceRepository.setCoinsByName(balance, username);
+    public UserBalance getUserBalanceForRead(String username) {
+        return userBalanceRepository.findForRead(username);
+    }
+
+    public UserBalance increaseBalance(String username, Long balance) {
+        return userBalanceRepository.increaseCoinsByName(balance, username);
+    }
+
+    public void decreaseBalance(String username, Long balance) {
+        userBalanceRepository.decreaseCoinsByName(balance, username);
     }
 
     public UserDetailsService userDetailsService() {

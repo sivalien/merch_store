@@ -61,8 +61,8 @@ public class SendCoinTest extends AbstractIntegrationTest {
         userBalanceRepository.create(username1);
         userBalanceRepository.create(username2);
 
-        Long prevCoins1 = userBalanceRepository.findByName(username1).coins();
-        Long prevCoins2 = userBalanceRepository.findByName(username2).coins();
+        Long prevCoins1 = userBalanceRepository.findForUpdate(username1).coins();
+        Long prevCoins2 = userBalanceRepository.findForUpdate(username2).coins();
 
         HttpHeaders authHeaders = new HttpHeaders();
         authHeaders.set("Content-Type", "application/json");
@@ -83,8 +83,8 @@ public class SendCoinTest extends AbstractIntegrationTest {
                 String.class
         );
 
-        Long coins1 = userBalanceRepository.findByName(username1).coins();
-        Long coins2 = userBalanceRepository.findByName(username2).coins();
+        Long coins1 = userBalanceRepository.findForUpdate(username1).coins();
+        Long coins2 = userBalanceRepository.findForUpdate(username2).coins();
         History history = historyRepository.findByFromUser(username1)
                 .stream()
                 .filter(currHistory -> currHistory.toUser().equals(username2) && currHistory.amount().equals(amount))
