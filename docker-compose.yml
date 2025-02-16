@@ -1,0 +1,26 @@
+services:
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: merch_store_db
+    environment:
+      - POSTGRES_USER=$MERCH_STORE_DB_USERNAME
+      - POSTGRES_PASSWORD=$MERCH_STORE_DB_PASSWORD
+      - POSTGRES_DB=merch_store
+    ports:
+      - "5432:5432"
+
+  merch_store:
+    build:
+      context: .
+    container_name: merch_store
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_USER=$MERCH_STORE_DB_USERNAME
+      - POSTGRES_PASSWORD=$MERCH_STORE_DB_PASSWORD
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/merch_store
+      - SPRING_DATASOURCE_USERNAME=$MERCH_STORE_DB_USERNAME
+      - SPRING_DATASOURCE_PASSWORD=$MERCH_STORE_DB_PASSWORD
+      - JWT_KEY=$JWT_KEY
+    ports:
+      - "8080:8080"
