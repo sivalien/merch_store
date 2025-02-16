@@ -39,6 +39,10 @@ public class BalanceService {
     @Transactional
     public void transfer(String fromUserName, SendCoinRequest sendCoinRequest) {
         UserBalance fromUser = userService.getUserBalance(fromUserName);
+        if (sendCoinRequest.toUser() == null)
+            throw new BadRequestException("Отсутствует обязательное поле toUser");
+        if (sendCoinRequest.amount() == null)
+            throw new BadRequestException("Отсутствует обязательное поле amount");
         if (sendCoinRequest.amount() > fromUser.coins())
             throw new BadRequestException("На вашем балансе недостаточно средств");
         UserBalance toUser = userService.getUserBalance(sendCoinRequest.toUser());

@@ -1,0 +1,13 @@
+## Как запустить  
+Установить locust  
+```
+pip3 install locust
+```
+Проверка установки 
+```
+locust -V
+```
+Запуск
+```
+locust -f src/test/python/load_testing.py --host=<your host>
+```
