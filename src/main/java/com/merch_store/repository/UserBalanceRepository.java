@@ -15,7 +15,7 @@ public class UserBalanceRepository {
 
     public void create(String username) {
         jdbcTemplate.update(
-                "insert into user_balance (username) values (?) ",
+                "insert into user_balance (username) values (?)",
                 username
         );
     }
